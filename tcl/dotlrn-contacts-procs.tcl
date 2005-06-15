@@ -80,13 +80,15 @@ ad_proc -public dotlrn_contacts::add_applet_to_community {
 		       -community_id $community_id \
 		      ]
 
-    contacts_portlet::add_self_to_page -portal_id $portal_id 
+
 
          
 
     # Just return the package_id from the mounted Contacts package (Singelton) 
 
     set package_id [apm_package_id_from_key contacts]
+
+    contacts_portlet::add_self_to_page -portal_id $portal_id -package_id $package_id
 
     # Add this community to contacts
         db_dml insert_map {
