@@ -53,8 +53,32 @@ ad_proc -public dotlrn_contacts::add_applet {
 } {
 
     # Contacts Package is Singleton and is required to install
-    # this package, so just add the applet to dotlrn.
- 
+    # this package, so just add the applet to dotlrn. And mount the
+    # Contacts Package under the dotlrn_url so users are able to
+    # to access Contacts from My Space.
+
+    # Mount the Contacts Package under the Community Url
+    set package_id [apm_package_id_from_key contacts]
+
+    if {![dotlrn::is_package_mounted -package_key contacts]} {
+	set com_url [dotlrn::get_url]
+
+	array set node_info [site_node::get_from_url -url $com_url -exact]
+	set parent_id $node_info(node_id)
+
+	db_transaction {
+	    set node_id [site_node::new \
+			     -name contacts \
+			     -parent_id $parent_id \
+			     -directory_p "t" \
+			     -pattern_p "t" \
+			    ]
+	}
+
+	site_node::mount -node_id $node_id -object_id $package_id
+
+    }
+
     dotlrn_applet::add_applet_to_dotlrn -applet_key [applet_key] -package_key [my_package_key]
 
 }
@@ -75,6 +99,26 @@ ad_proc -public dotlrn_contacts::add_applet_to_community {
     @params community_id
 } {
 
+    # Mount the Contacts Package under the Community Url
+    set package_id [apm_package_id_from_key contacts]
+
+    set com_url [dotlrn_community::get_community_url $community_id]
+
+    array set node_info [site_node::get_from_url -url $com_url -exact]
+    set parent_id $node_info(node_id)
+
+    db_transaction {
+	set node_id [site_node::new \
+			 -name contacts \
+			 -parent_id $parent_id \
+			 -directory_p "t" \
+			 -pattern_p "t" \
+			]
+    }
+
+    site_node::mount -node_id $node_id -object_id $package_id
+
+
 
     set portal_id [dotlrn_community::get_portal_id \
 		       -community_id $community_id \
@@ -84,9 +128,8 @@ ad_proc -public dotlrn_contacts::add_applet_to_community {
 
          
 
-    # Just return the package_id from the mounted Contacts package (Singelton) 
+    # Add the Portlet to this community 
 
-    set package_id [apm_package_id_from_key contacts]
 
     contacts_portlet::add_self_to_page -portal_id $portal_id -package_id $package_id
 
