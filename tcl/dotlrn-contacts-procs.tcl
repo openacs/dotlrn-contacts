@@ -260,3 +260,29 @@ ad_proc -private dotlrn_contacts::handle_rename {
 }
 
 
+ad_proc -private dotlrn_contacts::upgrade {
+    {-from_version_name:required }
+    {-to_version_name:required }
+} {
+    Procedures to upgrade dotlrn-contacts
+    
+    @author Miguel Marin (miguelmarin@viaro.net)
+    @author Viaro Networks www.viaro.net
+} {
+    apm_upgrade_logic \
+	-from_version_name $from_version_name \
+	-to_version_name $to_version_name \
+	-spec {
+	    0.1d 0.1d1 {
+		# We are going to add contacts portlet to the 
+		# templates
+		
+		db_foreach get_portal_templates { } {
+		    contacts_portlet::add_self_to_page \
+			-portal_id $portal_id \
+			-package_id 0
+		}
+	    }
+	}
+}
+
