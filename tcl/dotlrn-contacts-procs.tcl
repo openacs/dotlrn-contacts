@@ -57,12 +57,11 @@ ad_proc -public dotlrn_contacts::add_applet {
     # Contacts Package under the dotlrn_url so users are able to
     # to access Contacts from My Space.
 
-    # Mount the Contacts Package under the Community Url
     set package_id [apm_package_id_from_key contacts]
-
+    
     if {![dotlrn::is_package_mounted -package_key contacts]} {
-	set com_url [dotlrn::get_url]
-
+	Aset com_url [dotlrn::get_url]
+	
 	array set node_info [site_node::get_from_url -url $com_url -exact]
 	set parent_id $node_info(node_id)
 
@@ -74,11 +73,10 @@ ad_proc -public dotlrn_contacts::add_applet {
 			     -pattern_p "t" \
 			    ]
 	}
-
+	
 	site_node::mount -node_id $node_id -object_id $package_id
-
     }
-
+    
     dotlrn_applet::add_applet_to_dotlrn -applet_key [applet_key] -package_key [my_package_key]
 
 }
@@ -94,43 +92,17 @@ ad_proc -public dotlrn_contacts::remove_applet {
 ad_proc -public dotlrn_contacts::add_applet_to_community {
     community_id
 } {
-    Add the calendar applet to a specific dotlrn community
+    Add the contact applet to a specific dotlrn community
 
     @params community_id
 } {
 
-    # Mount the Contacts Package under the Community Url
     set package_id [apm_package_id_from_key contacts]
-
-    set com_url [dotlrn_community::get_community_url $community_id]
-
-    array set node_info [site_node::get_from_url -url $com_url -exact]
-    set parent_id $node_info(node_id)
-
-    db_transaction {
-	set node_id [site_node::new \
-			 -name contacts \
-			 -parent_id $parent_id \
-			 -directory_p "t" \
-			 -pattern_p "t" \
-			]
-    }
-
-    site_node::mount -node_id $node_id -object_id $package_id
-
-
-
     set portal_id [dotlrn_community::get_portal_id \
 		       -community_id $community_id \
 		      ]
 
-
-
-         
-
     # Add the Portlet to this community 
-
-
     contacts_portlet::add_self_to_page -portal_id $portal_id -package_id $package_id
 
     # Add this community to contacts
@@ -140,7 +112,6 @@ ad_proc -public dotlrn_contacts::add_applet_to_community {
         values
         (:community_id, 'f' ,:package_id)
         }
-
 
     # this should return the package_id
     return $package_id
