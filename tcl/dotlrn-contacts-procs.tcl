@@ -186,7 +186,7 @@ ad_proc -public dotlrn_contacts::remove_portlet {
     args
 } {
     A helper proc to remove the underlying portlet from the given portal.
-    This is alot simpler than add_portlet.
+    This is a lot simpler than add_portlet.
 
     @param portal_id
     @param args An ns_set with the project_manager_id.
